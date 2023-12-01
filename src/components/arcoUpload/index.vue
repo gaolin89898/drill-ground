@@ -45,6 +45,49 @@
         :scroll="scroll"
         :scrollbar="scrollbar"
       >
+        <template #empty>
+          <div class="empty">
+            <div class="emptyText">暂无文件</div>
+            <div class="emptyBnts">
+              <div @click="AddFile">
+                <img src="@/assets/img/addFlies.svg" alt="Image SVG" />
+                <span>新建文件夹</span>
+              </div>
+              <div>
+                <a-upload
+                  action="/"
+                  @change="fileChange"
+                  :auto-upload="false"
+                  :show-file-list="false"
+                  multiple
+                >
+                  <template #upload-button>
+                    <div class="uploadFile">
+                      <img src="@/assets/img/uploadFile.svg" alt="Image SVG" />
+                      <span>上传文件</span>
+                    </div>
+                  </template>
+                </a-upload>
+              </div>
+              <div>
+                <a-upload
+                  action="/"
+                  @change="fileChange"
+                  :auto-upload="false"
+                  :show-file-list="false"                 
+                  directory
+                >
+                  <template #upload-button>
+                    <div class="uploadFiles">
+                      <img src="@/assets/img/uploadFiles.svg" alt="Image SVG" />
+                      <span>上传文件夹</span>
+                    </div>
+                  </template>
+                </a-upload>
+              </div>
+            </div>
+          </div>
+        </template>
         <template #name="{ record }">
           <a-input
             v-if="record.edit"
@@ -62,7 +105,7 @@
             }"
           >
             <img
-              :src="imgHandle(record.floderType, record.file.name)"
+              :src="imgHandle(record.floderType, record.file?.name)"
               alt="Image SVG"
               :style="{
                 width: '33px',
@@ -76,7 +119,9 @@
           </span>
         </template>
         <template #size="{ record }">
-          <span v-if="record.floderType == 'file'">{{ record.file.size }}</span>
+          <span v-if="record.floderType == 'file'">
+            {{ record.file?.size }}
+          </span>
         </template>
         <template #controls="{ record }">
           <a-button type="text" @click.stop="renameClick(record)">
@@ -107,8 +152,11 @@
         <a-button
           :style="{
             position: 'absolute',
+            height: '50px',
+            width: '50px',
             bottom: '0',
             right: '0',
+            fontSize: '20px',
           }"
           type="primary"
           shape="circle"
@@ -143,7 +191,7 @@
           </a-upload>
           <a-upload
             action="/"
-            @change="fileClipChange"
+            @change="fileChange"
             :auto-upload="false"
             :show-file-list="false"
             directory
@@ -170,6 +218,7 @@
             :style="{
               color: '#1D2129',
             }"
+            @click="AddFile"
           >
             <template #icon>
               <icon-folder-add />
@@ -209,10 +258,10 @@
           v-model="filesName"
         />
       </div>
-      <!-- <div class="fileAddBottom">
+      <div class="fileAddBottom">
         <a-button @click="fileAddCancelClick">取消</a-button>
         <a-button @click="fileAddOKClick" type="primary">确定</a-button>
-      </div> -->
+      </div>
     </a-modal>
   </div>
 </template>
@@ -268,13 +317,13 @@ const scroll = {
 const uploadBtn = () => {
   visible.value = true;
 };
-//上传文件
-const fileChange = (_fileList: FileItem[], _fileItem: FileItem) => {};
-//上传文件夹
-const fileClipChange = (_fileList: FileItem[], fileItem: FileItem) => {
+//上传
+const fileChange = (_fileList: FileItem[], fileItem: FileItem) => {
   let key = targetPath.value;
   if (fileItem.file?.webkitRelativePath) {
     key += fileItem.file?.webkitRelativePath;
+  } else {
+    key += fileItem.file?.name;
   }
   useResourceManager.uploadFile(fileItem, 'file', key);
   tableData.value = useResourceManager.getList(targetPath.value);
@@ -299,7 +348,30 @@ const renameClick = (record: any) => {
   record.edit = true;
 };
 const editChange = (value: string, record: any) => {
-  useResourceManager.renameFile(value, record);
+  useResourceManager.renameFile(`${targetPath.value}${value}`, record);
+  tableData.value.forEach((item) => {
+    if (record.key === item.key) {
+      item.key = `${targetPath.value}${value}`;
+    }
+  });
+  record.edit = false;
+};
+//新建文件夹
+const AddFile = () => {
+  fileAddVisible.value = true;
+};
+//取消
+const fileAddCancelClick = () => {
+  fileAddVisible.value = false;
+};
+//确定
+const fileAddOKClick = () => {
+  useResourceManager.addFiles(
+    filesName.value == '' ? '新建文件夹' : filesName.value,
+    targetPath.value,
+  );
+  fileAddVisible.value = false;
+  tableData.value = useResourceManager.getList(targetPath.value);
 };
 
 const breadcrumb = (item: string) => {
@@ -342,7 +414,7 @@ function imgHandle(floderType: string, name: string) {
       return '/src/assets/img/videoSVG.svg';
     } else if (audio.test(name)) {
       return '/src/assets/img/musieSVG.svg';
-    }else{
+    } else {
       return '/src/assets/img/fileSVG.svg';
     }
   }
@@ -363,5 +435,63 @@ watch(
 .upload {
   margin-top: 20px;
   margin-left: 20px;
+}
+.empty {
+  width: 100%;
+  height: 455px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .emptyText {
+    font-size: 20px;
+    margin: 70px 0 30px;
+  }
+  .emptyBnts {
+    width: 500px;
+    display: flex;
+    justify-content: space-between;
+
+    div {
+      width: 150px;
+      height: 170px;
+      border-radius: 16px;
+      background: rgba(245, 245, 246, 0.9);
+      font-size: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      img {
+        width: 66px;
+        height: 63px;
+      }
+    }
+  }
+}
+
+.fileAddTop {
+  font-size: 22px;
+}
+.fileAddCenter {
+  width: 310px;
+  margin: 30px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  img {
+    margin: 15px 0;
+  }
+}
+.fileAddBottom {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  position: absolute;
+  bottom: 0;
+  .arco-btn {
+    &:nth-child(1) {
+      margin-right: 15px;
+    }
+  }
 }
 </style>

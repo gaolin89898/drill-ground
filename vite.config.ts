@@ -37,7 +37,6 @@ export default defineConfig({
         dirs: [
           'src/components',
           'src/layouts',
-          'src/views/LowbiBigScreen/componets',
         ],
     }),
     VueMacros({
