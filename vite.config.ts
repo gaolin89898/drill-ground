@@ -59,6 +59,8 @@ export default defineConfig({
   //   },
   // },
   server: {
+    port: 9400,
+    host: '0.0.0.0',
     proxy: {
       '/api': {
         target: 'http://192.168.0.219:8888',

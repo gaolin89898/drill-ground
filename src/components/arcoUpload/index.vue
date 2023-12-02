@@ -22,7 +22,7 @@
         position: 'relative',
       }"
     >
-      <a-breadcrumb :max-count="3">
+      <a-breadcrumb :max-count="6">
         <a-breadcrumb-item style="cursor: pointer" @click="breadcrumb('')">
           根目录
         </a-breadcrumb-item>
@@ -122,10 +122,9 @@
           </span>
         </template>
         <template #size="{ record }">
-          <span v-if="record.floderType == 'file'">
-            {{ caculateSize(record.file.size) }}
+          <span>
+            {{ useResourceManager.getSize(record.key) }}
           </span>
-          <span v-else>{{ caculateSize(record.size) }}</span>
         </template>
         <template #controls="{ record }">
           <a-button type="text" @click.stop="renameClick(record)">
@@ -428,20 +427,20 @@ function imgHandle(floderType: string, name: string) {
   }
 }
 
-function caculateSize(size:number) {
+function caculateSize(size: number) {
   if (!size && size !== 0) {
     return '--';
   }
   if (size < 1024) {
     return `${size}KB`;
   }
-  if (1024 < size && size < 1024 * 1024) {
+  if (1024 <= size && size < 1024 * 1024) {
     return `${Math.ceil(size / 1024)}KB`;
   }
-  if (1024 * 1024 < size && size < 1024 * 1024 * 1024) {
+  if (1024 * 1024 <= size && size < 1024 * 1024 * 1024) {
     return `${Math.ceil(size / (1024 * 1024))}MB`;
   }
-  if (1024 * 1024 * 1024 < size) {
+  if (1024 * 1024 * 1024 <= size) {
     return `${Math.ceil(size / (1024 * 1024 * 1024))}GB`;
   }
 }

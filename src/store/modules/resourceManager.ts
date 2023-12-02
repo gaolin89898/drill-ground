@@ -53,13 +53,12 @@ export const useStoreResourceManager = defineStore('ResourceManager', () => {
       floderType: 'folder',
       key: `${path}${name}`,
       edit: false,
+      size: 0,
     });
   }
 
   function getList(targetPath: string) {
     let targetList: FileInfo[] = [];
-    let folderSizes: Record<string, number> = {};
-
     fileMap.value.forEach((val, key) => {
       if (key.indexOf(targetPath) === 0) {
         // 判断是否还有子文件夹
@@ -91,23 +90,24 @@ export const useStoreResourceManager = defineStore('ResourceManager', () => {
         }
       }
     });
-    // 计算文件夹大小
-    targetList.forEach((item) => {
-      if (item.floderType === 'folder') {
-        let folderSize = 0;
-        fileMap.value.forEach((val, key) => {
-          if (key.indexOf(item.key) === 0) {
-            folderSize += val.file.size || 0;
-          }
-        });
-        item.size = folderSize;
-      }
-    });
+
     return targetList;
   }
 
+  function getSize(targetPath: string) {
+    let regex = new RegExp('^' + targetPath);
+    let size = 0;
+    fileMap.value.forEach((val, key) => {
+      console.log(val)
+      if (regex.test(key)) {
+        size += val.file?.size;
+      }
+    });
+    return size;
+  }
+
   function subitUpload() {
-    fileMap.value.forEach((value, key) => {
+    fileMap.value.forEach((value, _key) => {
       let uuid = workStore.createChunkList(value);
       let watchStopFn = watch(
         () => workStore.getFileInfo(uuid)?.progress,
@@ -181,5 +181,6 @@ export const useStoreResourceManager = defineStore('ResourceManager', () => {
     renameFile,
     addFiles,
     subitUpload,
+    getSize,
   };
 });
