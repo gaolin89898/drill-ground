@@ -1,6 +1,9 @@
 <template>
   <div class="upload" id="upload">
     <a-button type="outline" @click="uploadBtn">管理文件</a-button>
+    <a-button type="primary" style="margin-left: 15px" @click="submitUpload">
+      确定
+    </a-button>
 
     <a-modal
       v-model:visible="visible"
@@ -74,7 +77,7 @@
                   action="/"
                   @change="fileChange"
                   :auto-upload="false"
-                  :show-file-list="false"                 
+                  :show-file-list="false"
                   directory
                 >
                   <template #upload-button>
@@ -273,8 +276,10 @@ import {
   IconUpload,
   IconFolderAdd,
 } from '@arco-design/web-vue/es/icon';
-
 import { useStoreResourceManager } from '@/store/modules/resourceManager';
+
+import { ProgressShowInfo } from '@/store/modules/types';
+import { userWorkerStore } from '@/store/modules/worker';
 
 let visible = ref<boolean>(false);
 const fileAddVisible = ref<boolean>(false);
@@ -372,6 +377,79 @@ const fileAddOKClick = () => {
   );
   fileAddVisible.value = false;
   tableData.value = useResourceManager.getList(targetPath.value);
+};
+
+const workStore = userWorkerStore();
+
+const progressInfo = ref<Map<string, ProgressShowInfo>>(new Map());
+//确定上传
+const submitUpload = () => {
+  console.log(tableData.value);
+  tableData.value.forEach((item) => {
+    let uuid = workStore.createChunkList(item);
+    console.log(uuid);
+    let watchStopFn = watch(
+      () => workStore.getFileInfo(uuid)?.progress,
+      (val, _) => {
+        if (val == undefined) return;
+        progressInfo.value.set(uuid, {
+          progress: val,
+          title: '计算文件md5中.....',
+          uuid: uuid,
+        });
+        if (val === 1) {
+          setTimeout(() => {
+            let path = item.file?.name as string;
+            workStore.uploadFile(uuid, path);
+            progressInfo.value.set(uuid, {
+              progress: 0,
+              title: '上传文件中.....',
+              uuid: uuid,
+            });
+            watchStopFn();
+
+            let watchUpStopFile = watch(
+              () => workStore.getFileInfo(uuid)?.uploadedSlice?.length,
+              (val, _old) => {
+                if (val == undefined) return;
+                if (
+                  val === workStore.getFileInfo(uuid)?.chunkList.length &&
+                  val !== 0
+                ) {
+                  progressInfo.value.set(uuid, {
+                    progress: 1,
+                    title: '上传完成',
+                    uuid: uuid,
+                  });
+                  workStore
+                    .compeleUpload(uuid)
+                    .then((_res: any) => {})
+                    .catch((_err: any) => {});
+                  watchUpStopFile();
+                  return;
+                }
+
+                progressInfo.value.set(uuid, {
+                  progress:
+                    val / workStore.getFileInfo(uuid)?.chunkList.length!,
+                  title: '上传文件中.....',
+                  uuid: uuid,
+                });
+              },
+              {
+                deep: true,
+                immediate: true,
+              },
+            );
+          }, 1000);
+        }
+      },
+      {
+        deep: true,
+        immediate: true,
+      },
+    );
+  });
 };
 
 const breadcrumb = (item: string) => {
