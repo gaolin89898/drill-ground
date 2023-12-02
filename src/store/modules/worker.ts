@@ -4,14 +4,14 @@ import {
   MapMd5FileInfo,
   ReceiveMessage,
 } from '@/store/modules/types';
-import { FileItem } from '@arco-design/web-vue';
+import { FileInfo } from './types';
 import axios from 'axios';
 import { GetUploadIDReq } from './types';
 
 export const userWorkerStore = defineStore('workerStore', () => {
   // Web Worker 实例
   const webWorker = ref(
-    new Worker(new URL('../worker.ts', import.meta.url), { type: 'module' }),
+    new Worker(new URL('@/components/arcoUpload/worker.ts', import.meta.url), { type: 'module' }),
   );
   // 全局文件信息存储
   const globalFiles = ref(new Map<string, MapMd5FileInfo>());
@@ -49,9 +49,9 @@ export const userWorkerStore = defineStore('workerStore', () => {
   }
 
   // 创建切片列表
-  function createChunkList(file: FileItem, size = 1024 * 1024 * 5): string {
-    if (globalFiles.value.has(file.uid)) {
-      return file.uid;
+  function createChunkList(file: FileInfo, size = 1024 * 1024 * 5): string {
+    if (globalFiles.value.has(file.uid as string)) {
+      return file.uid as string;
     }
     let chunks: ChunkList = [];
     let cur = 0;
@@ -65,10 +65,10 @@ export const userWorkerStore = defineStore('workerStore', () => {
       index++;
       cur += size;
     }
-    globalFiles.value.set(file.uid, {
+    globalFiles.value.set(file.uid as string, {
       md5: '',
       progress: 0,
-      uuid: file.uid,
+      uuid: file.uid as string,
       chunkList: chunks,
       size: file.file?.size as number,
       isPause: false,
@@ -82,13 +82,14 @@ export const userWorkerStore = defineStore('workerStore', () => {
       chunkList: chunks,
     });
 
-    return file.uid;
+    return file.uid as string;
   }
 
   async function uploadFile(uuid: string, path: string): Promise<any> {
     try {
       await getUploadID(uuid, path);
       let fileInfo = globalFiles.value.get(uuid) as MapMd5FileInfo;
+      console.log(fileInfo,'fileInfo')
       if (fileInfo.uploadId === undefined) {
         return Promise.reject('upload id is undefined');
       }
@@ -138,8 +139,9 @@ export const userWorkerStore = defineStore('workerStore', () => {
       fileInfo.uploadedSlice =
         res.data.data.successChunkList === null
           ? []
-          : res.data.data.successChunkList;
+          : res.data.data.successChunkList;  
       globalFiles.value.set(uuid, fileInfo);
+      console.log(uuid,fileInfo,globalFiles.value)
       return Promise.resolve(fileInfo.uploadId);
     } catch (err) {
       return Promise.reject(err);

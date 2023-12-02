@@ -11,6 +11,7 @@ export type FileInfo = {
     response?: any;
     url?: string;
     name?: string;
+    size?:number
 }
 
 

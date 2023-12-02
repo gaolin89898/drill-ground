@@ -1,11 +1,15 @@
 import { FileItem } from '@arco-design/web-vue';
 import { defineStore } from 'pinia';
-import { FileInfo } from './types';
+import { FileInfo, ProgressShowInfo } from './types';
+import { userWorkerStore } from '@/store/modules/worker';
 
 export const useStoreResourceManager = defineStore('ResourceManager', () => {
   const fileMap = ref<Map<string, FileInfo>>(new Map());
 
-  //上传
+  const workStore = userWorkerStore();
+  const progressInfo = ref<Map<string, ProgressShowInfo>>(new Map());
+
+  //待上传
   function uploadFile(file: FileItem, type: string, key: string) {
     let fileInfo: FileInfo = {
       ...file,
@@ -54,6 +58,8 @@ export const useStoreResourceManager = defineStore('ResourceManager', () => {
 
   function getList(targetPath: string) {
     let targetList: FileInfo[] = [];
+    let folderSizes: Record<string, number> = {};
+
     fileMap.value.forEach((val, key) => {
       if (key.indexOf(targetPath) === 0) {
         // 判断是否还有子文件夹
@@ -62,7 +68,6 @@ export const useStoreResourceManager = defineStore('ResourceManager', () => {
         let subIndexs = subPath.split('/');
 
         if (subIndexs.length === 1) {
-          // 如果已经存在，就不添加了
           targetList.push({
             ...val,
             floderType: val.floderType,
@@ -70,7 +75,6 @@ export const useStoreResourceManager = defineStore('ResourceManager', () => {
             edit: false,
           });
         }
-
         if (subIndexs.length > 1) {
           let parentFolderName = subIndexs[0];
           let parentPaht = targetPath + parentFolderName;
@@ -82,11 +86,92 @@ export const useStoreResourceManager = defineStore('ResourceManager', () => {
             floderType: 'folder',
             key: parentPaht,
             edit: false,
+            size: 0,
           });
         }
       }
     });
+    // 计算文件夹大小
+    targetList.forEach((item) => {
+      if (item.floderType === 'folder') {
+        let folderSize = 0;
+        fileMap.value.forEach((val, key) => {
+          if (key.indexOf(item.key) === 0) {
+            folderSize += val.file.size || 0;
+          }
+        });
+        item.size = folderSize;
+      }
+    });
     return targetList;
+  }
+
+  function subitUpload() {
+    fileMap.value.forEach((value, key) => {
+      let uuid = workStore.createChunkList(value);
+      let watchStopFn = watch(
+        () => workStore.getFileInfo(uuid)?.progress,
+        (val, _) => {
+          if (val == undefined) return;
+          // progressInfo.value.set(uuid, {
+          //   progress: val,
+          //   title: '计算文件md5中.....',
+          //   uuid: uuid,
+          // });
+          if (val === 1) {
+            setTimeout(() => {
+              let path = value.key as string;
+              console.log(uuid, path, '2we35ratrewt');
+              workStore.uploadFile(uuid, path);
+              progressInfo.value.set(uuid, {
+                progress: 0,
+                title: '上传文件中.....',
+                uuid: uuid,
+              });
+              watchStopFn();
+
+              let watchUpStopFile = watch(
+                () => workStore.getFileInfo(uuid)?.uploadedSlice?.length,
+                (val, _old) => {
+                  if (val == undefined) return;
+                  if (
+                    val === workStore.getFileInfo(uuid)?.chunkList.length &&
+                    val !== 0
+                  ) {
+                    progressInfo.value.set(uuid, {
+                      progress: 1,
+                      title: '上传完成',
+                      uuid: uuid,
+                    });
+                    workStore
+                      .compeleUpload(uuid)
+                      .then((_res: any) => {})
+                      .catch((_err: any) => {});
+                    watchUpStopFile();
+                    return;
+                  }
+
+                  progressInfo.value.set(uuid, {
+                    progress:
+                      val / workStore.getFileInfo(uuid)?.chunkList.length!,
+                    title: '上传文件中.....',
+                    uuid: uuid,
+                  });
+                },
+                {
+                  deep: true,
+                  immediate: true,
+                },
+              );
+            }, 1000);
+          }
+        },
+        {
+          deep: true,
+          immediate: true,
+        },
+      );
+    });
   }
 
   return {
@@ -95,5 +180,6 @@ export const useStoreResourceManager = defineStore('ResourceManager', () => {
     delFile,
     renameFile,
     addFiles,
+    subitUpload,
   };
 });

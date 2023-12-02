@@ -123,8 +123,9 @@
         </template>
         <template #size="{ record }">
           <span v-if="record.floderType == 'file'">
-            {{ record.file?.size }}
+            {{ caculateSize(record.file.size) }}
           </span>
+          <span v-else>{{ caculateSize(record.size) }}</span>
         </template>
         <template #controls="{ record }">
           <a-button type="text" @click.stop="renameClick(record)">
@@ -278,9 +279,6 @@ import {
 } from '@arco-design/web-vue/es/icon';
 import { useStoreResourceManager } from '@/store/modules/resourceManager';
 
-import { ProgressShowInfo } from '@/store/modules/types';
-import { userWorkerStore } from '@/store/modules/worker';
-
 let visible = ref<boolean>(false);
 const fileAddVisible = ref<boolean>(false);
 
@@ -379,77 +377,9 @@ const fileAddOKClick = () => {
   tableData.value = useResourceManager.getList(targetPath.value);
 };
 
-const workStore = userWorkerStore();
-
-const progressInfo = ref<Map<string, ProgressShowInfo>>(new Map());
 //确定上传
 const submitUpload = () => {
-  console.log(tableData.value);
-  tableData.value.forEach((item) => {
-    let uuid = workStore.createChunkList(item);
-    console.log(uuid);
-    let watchStopFn = watch(
-      () => workStore.getFileInfo(uuid)?.progress,
-      (val, _) => {
-        if (val == undefined) return;
-        progressInfo.value.set(uuid, {
-          progress: val,
-          title: '计算文件md5中.....',
-          uuid: uuid,
-        });
-        if (val === 1) {
-          setTimeout(() => {
-            let path = item.file?.name as string;
-            workStore.uploadFile(uuid, path);
-            progressInfo.value.set(uuid, {
-              progress: 0,
-              title: '上传文件中.....',
-              uuid: uuid,
-            });
-            watchStopFn();
-
-            let watchUpStopFile = watch(
-              () => workStore.getFileInfo(uuid)?.uploadedSlice?.length,
-              (val, _old) => {
-                if (val == undefined) return;
-                if (
-                  val === workStore.getFileInfo(uuid)?.chunkList.length &&
-                  val !== 0
-                ) {
-                  progressInfo.value.set(uuid, {
-                    progress: 1,
-                    title: '上传完成',
-                    uuid: uuid,
-                  });
-                  workStore
-                    .compeleUpload(uuid)
-                    .then((_res: any) => {})
-                    .catch((_err: any) => {});
-                  watchUpStopFile();
-                  return;
-                }
-
-                progressInfo.value.set(uuid, {
-                  progress:
-                    val / workStore.getFileInfo(uuid)?.chunkList.length!,
-                  title: '上传文件中.....',
-                  uuid: uuid,
-                });
-              },
-              {
-                deep: true,
-                immediate: true,
-              },
-            );
-          }, 1000);
-        }
-      },
-      {
-        deep: true,
-        immediate: true,
-      },
-    );
-  });
+  useResourceManager.subitUpload();
 };
 
 const breadcrumb = (item: string) => {
@@ -498,10 +428,29 @@ function imgHandle(floderType: string, name: string) {
   }
 }
 
+function caculateSize(size:number) {
+  if (!size && size !== 0) {
+    return '--';
+  }
+  if (size < 1024) {
+    return `${size}KB`;
+  }
+  if (1024 < size && size < 1024 * 1024) {
+    return `${Math.ceil(size / 1024)}KB`;
+  }
+  if (1024 * 1024 < size && size < 1024 * 1024 * 1024) {
+    return `${Math.ceil(size / (1024 * 1024))}MB`;
+  }
+  if (1024 * 1024 * 1024 < size) {
+    return `${Math.ceil(size / (1024 * 1024 * 1024))}GB`;
+  }
+}
+
 watch(
   () => targetPath.value,
   (newVal) => {
     tableData.value = useResourceManager.getList(newVal);
+    // console.log(tableData.value)
   },
   {
     immediate: true,
