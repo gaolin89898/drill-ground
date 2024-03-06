@@ -1,12 +1,16 @@
 <template>
   <a-layout class="layout">
-    <layOutHeader></layOutHeader>
-    <layOutContent></layOutContent>
-    <layOutFotter></layOutFotter>
+    <layoutHeader></layoutHeader>
+    <layoutContent></layoutContent>
+<!--    <layoutFooter></layoutFooter>-->
   </a-layout>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import layoutHeader from '@/LayOut/layOutHeader/index.vue';
+import layoutContent from '@/LayOut/layoutContent/index.vue';
+// import layoutFooter from '@/LayOut/layOutFooter/index.vue';
+</script>
 
 <style lang="scss" scoped>
 .layout {
