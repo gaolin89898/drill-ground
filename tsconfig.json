@@ -42,6 +42,8 @@
     "src/**/*.vue",
     "./components.d.ts",
     "./auto-imports.d.ts"
-, "src/assets/icon/archivesIcon.js"  ],
+,
+    "src/assets/icon/drillIcon.js"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

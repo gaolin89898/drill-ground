@@ -10,12 +10,25 @@ const routes = [
     path: '/',
     component: Layout,
     name: 'layout',
-    redirect: '/fileExplorer',
+    redirect: '/home',
     children: [
+      {
+        path: '/home',
+        name: 'home',
+        component: () => import('@/view/home/index.vue'),
+        meta: {
+          title: '首页',
+          icon: 'drill-shouye',
+        },
+      },
       {
         path: '/fileExplorer',
         name: 'fileExplorer',
         component: () => import('@/view/fileExplorer/index.vue'),
+        meta: {
+          title: '资源管理器',
+          icon: 'drill-ziyuanguanliqi',
+        },
       },
     ],
   },

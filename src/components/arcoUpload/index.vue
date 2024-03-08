@@ -458,10 +458,6 @@ watch(
 );
 </script>
 <style lang="scss" scoped>
-.upload {
-  margin-top: 20px;
-  margin-left: 20px;
-}
 .empty {
   width: 100%;
   height: 455px;
