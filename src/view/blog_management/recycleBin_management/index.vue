@@ -1,14 +1,8 @@
 <template>
   <a-row>
     <a-col :span="12">
-      <a-button type="primary">
-        <template #icon>
-          <icon-plus />
-        </template>
-        新增标签
-      </a-button>
       <a-input
-        :style="{ width: '320px', marginLeft: '16px' }"
+        :style="{ width: '320px' }"
         placeholder="请输入要搜索内容"
         allow-clear
       />
@@ -24,7 +18,7 @@
         :style="{ width: '110px', marginLeft: '16px' }"
         v-model="selectValue"
       >
-        <a-option>创建时间</a-option>
+        <a-option>发布时间</a-option>
         <a-option>修改时间</a-option>
       </a-select>
       <a-range-picker
@@ -46,31 +40,35 @@
 <script setup lang="ts">
 const columns = [
   {
-    title: '标签ID',
+    title: '内容ID',
     dataIndex: 'salary',
   },
   {
-    title: '标签名称',
+    title: '标题',
     dataIndex: 'name',
   },
   {
-    title: '描述',
+    title: '分类',
+    dataIndex: 'status',
+  },
+  {
+    title: '删除时间',
     dataIndex: 'name',
   },
   {
-    title: '创建时间',
+    title: '删除时间',
     dataIndex: 'name',
   },
   {
-    title: '修改时间',
+    title: '恢复时间',
     dataIndex: 'name',
   },
   {
-    title: '关联文章ID',
+    title: '状态',
     dataIndex: 'name',
   },
 ];
-const selectValue = ref<string>('创建时间');
+const selectValue = ref<string>('发布时间');
 </script>
 
 <style scoped lang="scss">

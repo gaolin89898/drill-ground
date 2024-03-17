@@ -14,7 +14,9 @@ const props = defineProps({
   },
 });
 
-const IconFont = Icon.addFromIconFontCn({ src: '/src/assets/icon/index.js' });
+const IconFont = Icon.addFromIconFontCn({
+  src: '/src/assets/icon/drillIcon.js',
+});
 </script>
 
 <template>

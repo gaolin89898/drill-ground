@@ -9,20 +9,47 @@
           <a-menu
             mode="pop"
             theme="light"
-            :selected-keys="$route.path"
-            @menu-item-click="menuClick(item)"
-            v-for="item in menus[0].children"
+            :selected-keys="[$route.path]"
+            @menu-item-click="menuClick"
           >
-            <a-menu-item :key="item.path">
-              <template #icon>
-                <icon
-                  :icon-type="item.meta?.icon as string"
-                  size="15"
-                  color="red"
-                ></icon>
-              </template>
-              {{ item.meta?.title }}
-            </a-menu-item>
+            <div v-for="item in menus">
+              <a-menu-item v-if="!item.children" :key="item.path">
+                <template #icon>
+                  <Icon
+                    :icon-type="item.meta?.icon as string"
+                    size="15"
+                    color="red"
+                  />
+                </template>
+                {{ item.meta?.title }}
+              </a-menu-item>
+              <a-sub-menu v-else>
+                <template #icon>
+                  <Icon
+                    :icon-type="item.meta?.icon as string"
+                    size="15"
+                    color="red"
+                  />
+                </template>
+                <template #title>
+                  {{ item.meta?.title }}
+                </template>
+                <a-menu-item
+                  v-for="v in item.children"
+                  :key="v.path"
+                  v-show="v.meta?.hidden"
+                >
+                  <template #icon>
+                    <Icon
+                      :icon-type="v.meta?.icon as string"
+                      size="15"
+                      color="red"
+                    />
+                  </template>
+                  {{ v.meta?.title }}
+                </a-menu-item>
+              </a-sub-menu>
+            </div>
           </a-menu>
         </a-layout-sider>
       </div>
@@ -33,25 +60,20 @@
   </a-layout>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import layoutHeader from '@/LayOut/layOutHeader/index.vue';
 import layoutContent from '@/LayOut/layoutContent/index.vue';
 
-const menus = useRouter().options.routes;
+const menus = useRouter().options.routes[0].children;
 const router = useRouter();
-
 /**
  * 菜单跳转
  * */
-const menuClick = (item: any) => {
+const menuClick = (key: string) => {
   router.push({
-    path: item.path,
+    path: key,
   });
 };
-
-onMounted(() => {
-  console.log(menus);
-});
 </script>
 
 <style lang="scss" scoped>

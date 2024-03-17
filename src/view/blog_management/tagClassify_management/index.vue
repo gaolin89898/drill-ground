@@ -18,8 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import tagManagement from '@/view/tagClassify_management/components/tag_management/index.vue';
-import classifyManagement from '@/view/tagClassify_management/components/classify_management/index.vue';
+import tagManagement from '@/view/blog_management/tagClassify_management/components/tag_management/index.vue';
+import classifyManagement from '@/view/blog_management/tagClassify_management/components/classify_management/index.vue';
 </script>
 
 <style scoped lang="scss"></style>
