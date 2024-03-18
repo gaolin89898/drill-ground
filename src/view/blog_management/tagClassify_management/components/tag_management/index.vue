@@ -1,7 +1,7 @@
 <template>
   <a-row>
     <a-col :span="12">
-      <a-button type="primary">
+      <a-button type="primary" @click="addClick">
         <template #icon>
           <icon-plus />
         </template>
@@ -41,11 +41,28 @@
       marginTop: '16px',
     }"
     :data="tagList"
-  ></a-table>
+  >
+    <template #operate="{ record }">
+      <a-button type="text" @click="editClick(record)">编辑</a-button>
+      <a-button type="text" status="danger">删除</a-button>
+    </template>
+  </a-table>
+  <addEditTag ref="addEditTagRef"></addEditTag>
 </template>
 
 <script setup lang="ts">
-const columns = [
+import { TableColumnData } from '@arco-design/web-vue';
+import addEditTag from './components/addEditTag.vue';
+
+/**
+ * 搜索
+ */
+const selectValue = ref<string>('创建时间');
+
+/**
+ * 表格
+ */
+const columns: TableColumnData[] = [
   {
     title: '标签ID',
     dataIndex: 'tagID',
@@ -70,8 +87,13 @@ const columns = [
     title: '修改时间',
     dataIndex: 'change_time',
   },
+  {
+    title: '操作',
+    dataIndex: 'operate',
+    slotName: 'operate',
+    align: 'center',
+  },
 ];
-
 const tagList = ref([
   {
     tagID: 1,
@@ -82,12 +104,20 @@ const tagList = ref([
     change_time: '2024-03-14 21:19:54',
   },
 ]);
-const selectValue = ref<string>('创建时间');
+
+const onChange = () => {};
+const onSelect = () => {};
+
+/**
+ * 新增,编辑 标签
+ */
+const addEditTagRef = ref();
+const addClick = () => {
+  addEditTagRef.value.openClick({ id: 0 });
+};
+const editClick = (record: any) => {
+  addEditTagRef.value.openClick({ id: record.tagID });
+};
 </script>
 
-<style scoped lang="scss">
-.ll {
-  display: flex;
-  justify-content: flex-end;
-}
-</style>
+<style scoped lang="scss"></style>

@@ -9,7 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@wangeditor/editor": "^5.1.23",
+    "@editorjs/code": "^2.9.0",
+    "@editorjs/delimiter": "^1.4.0",
+    "@editorjs/editorjs": "^2.29.0",
+    "@editorjs/embed": "^2.7.0",
+    "@editorjs/header": "^2.8.1",
+    "@editorjs/image": "^2.9.0",
+    "@editorjs/list": "^1.9.0",
+    "@editorjs/paragraph": "^2.11.3",
+    "@editorjs/quote": "^2.6.0",
+    "@editorjs/table": "^2.3.0",
     "axios": "^1.6.2",
     "hash-wasm": "^4.11.0",
     "pinia": "^2.1.7",

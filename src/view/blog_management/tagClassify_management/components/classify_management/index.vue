@@ -1,7 +1,7 @@
 <template>
   <a-row>
     <a-col :span="12">
-      <a-button type="primary">
+      <a-button type="primary" @click="addClick">
         <template #icon>
           <icon-plus />
         </template>
@@ -35,19 +35,39 @@
     </a-col>
   </a-row>
   <a-table
+    :data="classifyList"
     :columns="columns"
     :bordered="false"
     :style="{
       marginTop: '16px',
     }"
-  ></a-table>
+  >
+    <template #operate="{ record }">
+      <a-button type="text" @click="editClick(record)">编辑</a-button>
+      <a-button type="text" status="danger">删除</a-button>
+    </template>
+  </a-table>
+  <addEditClassify ref="addEditClassifyRef"></addEditClassify>
 </template>
 
 <script setup lang="ts">
-const columns = [
+import { TableColumnData } from '@arco-design/web-vue';
+import addEditClassify from './components/addEditClassify.vue';
+
+/**
+ * 搜索
+ */
+const selectValue = ref<string>('创建时间');
+const onChange = () => {};
+const onSelect = () => {};
+
+/**
+ * 表格
+ */
+const columns: TableColumnData[] = [
   {
     title: '分类ID',
-    dataIndex: 'salary',
+    dataIndex: 'classifyID',
   },
   {
     title: '分类名称',
@@ -55,22 +75,48 @@ const columns = [
   },
   {
     title: '描述',
-    dataIndex: 'name',
+    dataIndex: 'describe',
   },
   {
     title: '创建时间',
-    dataIndex: 'name',
+    dataIndex: 'creation_time',
   },
   {
     title: '修改时间',
-    dataIndex: 'name',
+    dataIndex: 'change_time',
   },
   {
     title: '关联文章ID',
-    dataIndex: 'name',
+    dataIndex: 'articleID',
+  },
+  {
+    title: '操作',
+    dataIndex: 'operate',
+    slotName: 'operate',
+    align: 'center',
   },
 ];
-const selectValue = ref<string>('创建时间');
+const classifyList = ref([
+  {
+    classifyID: 1,
+    name: '终端美化',
+    describe: '改善命令行界面外观和用户体验的技术、工具或主题',
+    articleID: 1,
+    creation_time: '2024-03-13 21:19:54',
+    change_time: '2024-03-14 21:19:54',
+  },
+]);
+
+/**
+ * 新增，编辑分类
+ */
+const addEditClassifyRef = ref();
+const addClick = () => {
+  addEditClassifyRef.value.openClick({ id: 0 });
+};
+const editClick = (record: any) => {
+  addEditClassifyRef.value.openClick({ id: record.classifyID });
+};
 </script>
 
 <style scoped lang="scss"></style>
