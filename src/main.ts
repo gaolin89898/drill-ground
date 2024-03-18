@@ -7,7 +7,6 @@ import store from '@/store';
 import '@arco-design/web-vue/dist/arco.css';
 import './assets/icon/drillIcon.js';
 
-
 createApp(App)
   .use(router)
   .use(store)

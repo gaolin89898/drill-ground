@@ -67,8 +67,8 @@
       </template>
     </template>
     <template #operate="{ record }">
-      <a-button type="text">编辑</a-button>
-      <a-button type="text">删除</a-button>
+      <a-button type="text" @click="editArticle(record)">编辑</a-button>
+      <a-button type="text" status="danger">删除</a-button>
     </template>
   </a-table>
 </template>
@@ -212,6 +212,11 @@ const articleList = ref([
 const selectValue = ref<string>('发布时间');
 
 const AddArticle = () => {
+  router.push({
+    path: '/blog_management/addArticle',
+  });
+};
+const editArticle = (_record: any) => {
   router.push({
     path: '/blog_management/addArticle',
   });
