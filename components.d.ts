@@ -7,12 +7,10 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    ABreadcrumb: typeof import('@arco-design/web-vue')['Breadcrumb']
-    ABreadcrumbItem: typeof import('@arco-design/web-vue')['BreadcrumbItem']
     AButton: typeof import('@arco-design/web-vue')['Button']
     ACard: typeof import('@arco-design/web-vue')['Card']
     ACol: typeof import('@arco-design/web-vue')['Col']
-    ADatePicker: typeof import('@arco-design/web-vue')['DatePicker']
+    ADivider: typeof import('@arco-design/web-vue')['Divider']
     AEmpty: typeof import('@arco-design/web-vue')['Empty']
     AForm: typeof import('@arco-design/web-vue')['Form']
     AFormItem: typeof import('@arco-design/web-vue')['FormItem']
@@ -27,6 +25,7 @@ declare module 'vue' {
     AMenuItem: typeof import('@arco-design/web-vue')['MenuItem']
     AModal: typeof import('@arco-design/web-vue')['Modal']
     AOption: typeof import('@arco-design/web-vue')['Option']
+    AProgress: typeof import('@arco-design/web-vue')['Progress']
     ARangePicker: typeof import('@arco-design/web-vue')['RangePicker']
     ArcoUpload: typeof import('./src/components/arcoUpload/index.vue')['default']
     ARow: typeof import('@arco-design/web-vue')['Row']
@@ -37,6 +36,7 @@ declare module 'vue' {
     ATabPane: typeof import('@arco-design/web-vue')['TabPane']
     ATabs: typeof import('@arco-design/web-vue')['Tabs']
     ATag: typeof import('@arco-design/web-vue')['Tag']
+    ATextarea: typeof import('@arco-design/web-vue')['Textarea']
     ATrigger: typeof import('@arco-design/web-vue')['Trigger']
     AUpload: typeof import('@arco-design/web-vue')['Upload']
     EditorJs: typeof import('./src/components/editorJs/index.vue')['default']
