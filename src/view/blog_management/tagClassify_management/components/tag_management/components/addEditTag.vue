@@ -10,7 +10,7 @@
         />
       </a-form-item>
       <a-form-item field="describe" label="标签描述：">
-        <a-input v-model="form.name" placeholder="请输入标签描述" />
+        <a-input placeholder="请输入标签描述" />
       </a-form-item>
     </a-form>
   </a-modal>

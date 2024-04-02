@@ -46,7 +46,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  
+
   // css: {
   //   /* CSS 预处理器 */
   //   preprocessorOptions: {
@@ -60,9 +60,8 @@ export default defineConfig({
     host: '0.0.0.0',
     proxy: {
       '/api': {
-        target: 'http://192.168.0.219:8888',
+        target: 'http://localhost:3200',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

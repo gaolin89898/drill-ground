@@ -35,12 +35,13 @@
     </a-col>
   </a-row>
   <a-table
+    :data="list"
     :columns="columns"
     :bordered="false"
+    :pagination="false"
     :style="{
       marginTop: '16px',
     }"
-    :data="tagList"
   >
     <template #operate="{ record }">
       <a-button type="text" @click="editClick(record)">编辑</a-button>
@@ -53,6 +54,7 @@
 <script setup lang="ts">
 import { TableColumnData } from '@arco-design/web-vue';
 import addEditTag from './components/addEditTag.vue';
+import { tagList } from '@/api/tag/index';
 
 /**
  * 搜索
@@ -64,24 +66,16 @@ const selectValue = ref<string>('创建时间');
  */
 const columns: TableColumnData[] = [
   {
-    title: '标签ID',
-    dataIndex: 'tagID',
-  },
-  {
     title: '标签名称',
-    dataIndex: 'name',
+    dataIndex: 'tagName',
   },
   {
     title: '描述',
     dataIndex: 'describe',
   },
   {
-    title: '关联文章ID',
-    dataIndex: 'articleID',
-  },
-  {
     title: '创建时间',
-    dataIndex: 'creation_time',
+    dataIndex: 'createAt',
   },
   {
     title: '修改时间',
@@ -94,16 +88,23 @@ const columns: TableColumnData[] = [
     align: 'center',
   },
 ];
-const tagList = ref([
-  {
-    tagID: 1,
-    name: '终端美化',
-    describe: '改善命令行界面外观和用户体验的技术、工具或主题',
-    articleID: 1,
-    creation_time: '2024-03-13 21:19:54',
-    change_time: '2024-03-14 21:19:54',
-  },
-]);
+const list = ref<any[]>([]);
+// const tagList = ref([
+//   {
+//     tagID: 1,
+//     name: '终端美化',
+//     describe: '改善命令行界面外观和用户体验的技术、工具或主题',
+//     articleID: 1,
+//     creation_time: '2024-03-13 21:19:54',
+//     change_time: '2024-03-14 21:19:54',
+//   },
+// ]);
+
+const tagData = async () => {
+  await tagList().then((res) => {
+    list.value = res.data.data;
+  });
+};
 
 const onChange = () => {};
 const onSelect = () => {};
@@ -118,6 +119,9 @@ const addClick = () => {
 const editClick = (record: any) => {
   addEditTagRef.value.openClick({ id: record.tagID });
 };
+onMounted(() => {
+  tagData();
+});
 </script>
 
 <style scoped lang="scss"></style>
