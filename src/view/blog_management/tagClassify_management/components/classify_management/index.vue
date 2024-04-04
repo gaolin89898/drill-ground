@@ -8,86 +8,63 @@
         新增分类
       </a-button>
       <a-input
+        v-model="classificationName"
         :style="{ width: '320px', marginLeft: '16px' }"
         placeholder="请输入要搜索内容"
         allow-clear
-      />
-    </a-col>
-    <a-col
-      :span="12"
-      :style="{
-        display: 'flex',
-        'justify-content': 'flex-end',
-      }"
-    >
-      <a-select
-        :style="{ width: '110px', marginLeft: '16px' }"
-        v-model="selectValue"
-      >
-        <a-option>创建时间</a-option>
-        <a-option>修改时间</a-option>
-      </a-select>
-      <a-range-picker
-        @change="onChange"
-        @select="onSelect"
-        :style="{ width: '254px', marginLeft: '16px' }"
+        @change="nameChange"
       />
     </a-col>
   </a-row>
   <a-table
-    :data="classifyList"
+    :data="list"
     :columns="columns"
     :bordered="false"
+    :pagination="false"
     :style="{
       marginTop: '16px',
     }"
   >
+    <template #describe="{ record }">
+      <span v-if="record.describe">{{ record.describe }}</span>
+      <span v-else>--</span>
+    </template>
+    <template #createAt="{ record }">
+      {{ dayjs(record.createAt).format('YYYY-MM-DD HH:mm:ss') }}
+    </template>
     <template #operate="{ record }">
       <a-button type="text" @click="editClick(record)">编辑</a-button>
-      <a-button type="text" status="danger">删除</a-button>
+      <a-button type="text" status="danger" @click="delBtn(record)">
+        删除
+      </a-button>
     </template>
   </a-table>
-  <addEditClassify ref="addEditClassifyRef"></addEditClassify>
+  <addEditclassification ref="addEditclassificationRef" @refresh="refresh"></addEditclassification>
 </template>
 
 <script setup lang="ts">
-import { TableColumnData } from '@arco-design/web-vue';
-import addEditClassify from './components/addEditClassify.vue';
-
-/**
- * 搜索
- */
-const selectValue = ref<string>('创建时间');
-const onChange = () => {};
-const onSelect = () => {};
+import { Message, TableColumnData } from '@arco-design/web-vue';
+import addEditclassification from './components/addEditClass.vue';
+import { classificationList, deleteClassification } from '@/api/class/index';
+import dayjs from 'dayjs';
 
 /**
  * 表格
  */
 const columns: TableColumnData[] = [
   {
-    title: '分类ID',
-    dataIndex: 'classifyID',
-  },
-  {
     title: '分类名称',
-    dataIndex: 'name',
+    dataIndex: 'classificationName',
   },
   {
     title: '描述',
     dataIndex: 'describe',
+    slotName: 'describe',
   },
   {
     title: '创建时间',
-    dataIndex: 'creation_time',
-  },
-  {
-    title: '修改时间',
-    dataIndex: 'change_time',
-  },
-  {
-    title: '关联文章ID',
-    dataIndex: 'articleID',
+    dataIndex: 'createAt',
+    slotName: 'createAt',
   },
   {
     title: '操作',
@@ -96,27 +73,53 @@ const columns: TableColumnData[] = [
     align: 'center',
   },
 ];
-const classifyList = ref([
-  {
-    classifyID: 1,
-    name: '终端美化',
-    describe: '改善命令行界面外观和用户体验的技术、工具或主题',
-    articleID: 1,
-    creation_time: '2024-03-13 21:19:54',
-    change_time: '2024-03-14 21:19:54',
-  },
-]);
+const list = ref<any[]>([]);
 
+const classificationName = ref<string>('');
+
+const classificationData = async () => {
+  await classificationList({ classificationName: classificationName.value }).then((res) => {
+    list.value = res.data.data;
+  });
+};
 /**
- * 新增，编辑分类
+ * 新增,编辑 分类
  */
-const addEditClassifyRef = ref();
+const addEditclassificationRef = ref();
 const addClick = () => {
-  addEditClassifyRef.value.openClick({ id: 0 });
+  addEditclassificationRef.value.openClick({ id: '' });
 };
 const editClick = (record: any) => {
-  addEditClassifyRef.value.openClick({ id: record.classifyID });
+  addEditclassificationRef.value.openClick({ id: record._id });
 };
+
+/**
+ * 删除分类
+ */
+const delBtn = async (record: any) => {
+  await deleteClassification(record._id)
+    .then(() => {
+      Message.success('删除分类成功');
+      classificationData();
+    })
+    .catch((error: any) => {
+      Message.error(error.msg);
+    });
+};
+
+/**
+ * 查询
+ */
+const nameChange = () => {
+  classificationData();
+};
+
+const refresh = () => {
+  classificationData();
+};
+onMounted(() => {
+  classificationData();
+});
 </script>
 
 <style scoped lang="scss"></style>

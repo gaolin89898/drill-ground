@@ -8,29 +8,11 @@
         新增标签
       </a-button>
       <a-input
+        v-model="tagName"
         :style="{ width: '320px', marginLeft: '16px' }"
         placeholder="请输入要搜索内容"
         allow-clear
-      />
-    </a-col>
-    <a-col
-      :span="12"
-      :style="{
-        display: 'flex',
-        'justify-content': 'flex-end',
-      }"
-    >
-      <a-select
-        :style="{ width: '110px', marginLeft: '16px' }"
-        v-model="selectValue"
-      >
-        <a-option>创建时间</a-option>
-        <a-option>修改时间</a-option>
-      </a-select>
-      <a-range-picker
-        @change="onChange"
-        @select="onSelect"
-        :style="{ width: '254px', marginLeft: '16px' }"
+        @change="nameChange"
       />
     </a-col>
   </a-row>
@@ -43,23 +25,28 @@
       marginTop: '16px',
     }"
   >
+    <template #describe="{ record }">
+      <span v-if="record.describe">{{ record.describe }}</span>
+      <span v-else>--</span>
+    </template>
+    <template #createAt="{ record }">
+      {{ dayjs(record.createAt).format('YYYY-MM-DD HH:mm:ss') }}
+    </template>
     <template #operate="{ record }">
       <a-button type="text" @click="editClick(record)">编辑</a-button>
-      <a-button type="text" status="danger">删除</a-button>
+      <a-button type="text" status="danger" @click="delBtn(record)">
+        删除
+      </a-button>
     </template>
   </a-table>
-  <addEditTag ref="addEditTagRef"></addEditTag>
+  <addEditTag ref="addEditTagRef" @refresh="refresh"></addEditTag>
 </template>
 
 <script setup lang="ts">
-import { TableColumnData } from '@arco-design/web-vue';
+import { Message, TableColumnData } from '@arco-design/web-vue';
 import addEditTag from './components/addEditTag.vue';
-import { tagList } from '@/api/tag/index';
-
-/**
- * 搜索
- */
-const selectValue = ref<string>('创建时间');
+import { tagList, deleteTag } from '@/api/tag/index';
+import dayjs from 'dayjs';
 
 /**
  * 表格
@@ -72,14 +59,12 @@ const columns: TableColumnData[] = [
   {
     title: '描述',
     dataIndex: 'describe',
+    slotName: 'describe',
   },
   {
     title: '创建时间',
     dataIndex: 'createAt',
-  },
-  {
-    title: '修改时间',
-    dataIndex: 'change_time',
+    slotName: 'createAt',
   },
   {
     title: '操作',
@@ -89,35 +74,48 @@ const columns: TableColumnData[] = [
   },
 ];
 const list = ref<any[]>([]);
-// const tagList = ref([
-//   {
-//     tagID: 1,
-//     name: '终端美化',
-//     describe: '改善命令行界面外观和用户体验的技术、工具或主题',
-//     articleID: 1,
-//     creation_time: '2024-03-13 21:19:54',
-//     change_time: '2024-03-14 21:19:54',
-//   },
-// ]);
+
+const tagName = ref<string>('');
 
 const tagData = async () => {
-  await tagList().then((res) => {
+  await tagList({ tagName: tagName.value }).then((res) => {
     list.value = res.data.data;
   });
 };
-
-const onChange = () => {};
-const onSelect = () => {};
-
 /**
  * 新增,编辑 标签
  */
 const addEditTagRef = ref();
 const addClick = () => {
-  addEditTagRef.value.openClick({ id: 0 });
+  addEditTagRef.value.openClick({ id: '' });
 };
 const editClick = (record: any) => {
-  addEditTagRef.value.openClick({ id: record.tagID });
+  addEditTagRef.value.openClick({ id: record._id });
+};
+
+/**
+ * 删除标签
+ */
+const delBtn = async (record: any) => {
+  await deleteTag(record._id)
+    .then(() => {
+      Message.success('删除标签成功');
+      tagData();
+    })
+    .catch((error: any) => {
+      Message.error(error.msg);
+    });
+};
+
+/**
+ * 查询
+ */
+const nameChange = () => {
+  tagData();
+};
+
+const refresh = () => {
+  tagData();
 };
 onMounted(() => {
   tagData();

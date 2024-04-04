@@ -11,7 +11,7 @@
     @before-close="beforeClose"
   >
     <span style="font-size: 20px">
-      {{ id == '' ? '新增标签' : '编辑标签' }}
+      {{ id == '' ? '新增分类' : '编辑分类' }}
     </span>
     <a-form
       :model="form"
@@ -20,14 +20,17 @@
       @submit="handleSubmit"
     >
       <a-form-item
-        field="tagName"
-        label="标签名称："
-        :rules="[{ required: true, message: '请输入标签名称' }]"
+        field="classificationName"
+        label="分类名称："
+        :rules="[{ required: true, message: '请输入分类名称' }]"
       >
-        <a-input v-model="form.tagName" placeholder="请输入标签名称" />
+        <a-input
+          v-model="form.classificationName"
+          placeholder="请输入分类名称"
+        />
       </a-form-item>
-      <a-form-item field="describe" label="标签描述：">
-        <a-input v-model="form.describe" placeholder="请输入标签描述" />
+      <a-form-item field="describe" label="分类描述：">
+        <a-input v-model="form.describe" placeholder="请输入分类描述" />
       </a-form-item>
       <a-form-item
         :style="{
@@ -45,7 +48,11 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { addTag, tagOne, editTag } from '@/api/tag';
+import {
+  addClassification,
+  classificationOne,
+  editClassification,
+} from '@/api/class';
 import { Message, ValidatedError } from '@arco-design/web-vue';
 
 /**
@@ -57,9 +64,9 @@ const id = ref<string>('');
 const openClick = async (data: { id: string }) => {
   visible.value = true;
   if (data.id !== '') {
-    await tagOne(data.id).then((res) => {
+    await classificationOne(data.id).then((res) => {
       form.value = {
-        tagName: res.data.data.tagName,
+        classificationName: res.data.data.classificationName,
         describe: res.data.data.describe,
       };
     });
@@ -71,7 +78,7 @@ const openClick = async (data: { id: string }) => {
  * 表单
  */
 const form = ref({
-  tagName: '',
+  classificationName: '',
   describe: '',
 });
 
@@ -85,9 +92,9 @@ const handleSubmit = () => {
     ) => {
       if (!callback) {
         if (id.value == '') {
-          await addTag(form.value)
+          await addClassification(form.value)
             .then(() => {
-              Message.success('添加标签成功');
+              Message.success('添加分类成功');
               visible.value = false;
               emits('refresh');
             })
@@ -95,9 +102,9 @@ const handleSubmit = () => {
               Message.error(error.msg);
             });
         } else {
-          await editTag({ _id: id.value, ...form.value })
+          await editClassification({ _id: id.value, ...form.value })
             .then(() => {
-              Message.success('编辑标签成功');
+              Message.success('编辑分类成功');
               visible.value = false;
               emits('refresh');
             })
