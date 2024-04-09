@@ -38,7 +38,7 @@
     :style="{
       marginTop: '16px',
     }"
-    :data="articleList"
+    :data="articleData"
   >
     <!-- 状态 -->
     <template #status="{ record }">
@@ -75,17 +75,14 @@
 
 <script setup lang="ts">
 import { TableColumnData } from '@arco-design/web-vue';
+import { articleList } from '@/api/article/index';
 
 const router = useRouter();
 
 const columns: TableColumnData[] = [
   {
-    title: '文章ID',
-    dataIndex: 'articleID',
-  },
-  {
     title: '标题',
-    dataIndex: 'title',
+    dataIndex: 'articleName',
   },
   {
     title: '状态',
@@ -107,7 +104,7 @@ const columns: TableColumnData[] = [
   },
   {
     title: '分类',
-    dataIndex: 'classify',
+    dataIndex: 'classID',
     filterable: {
       filters: [
         {
@@ -122,11 +119,11 @@ const columns: TableColumnData[] = [
       filter: (value, record) => record.salary > value,
       multiple: true,
     },
-    slotName: 'classify',
+    slotName: 'classID',
   },
   {
     title: '标签',
-    dataIndex: 'tag',
+    dataIndex: 'tagID',
     filterable: {
       filters: [
         {
@@ -141,18 +138,18 @@ const columns: TableColumnData[] = [
       filter: (value, record) => record.salary > value,
       multiple: true,
     },
-    slotName: 'tag',
+    slotName: 'tagID',
   },
   {
     title: '发布时间',
-    dataIndex: 'release_time',
+    dataIndex: 'createAt',
     sortable: {
       sortDirections: ['ascend', 'descend'],
     },
   },
   {
     title: '修改时间',
-    dataIndex: 'change_time',
+    dataIndex: 'reviseAt',
     sortable: {
       sortDirections: ['ascend', 'descend'],
     },
@@ -165,62 +162,35 @@ const columns: TableColumnData[] = [
   },
 ];
 
-const articleList = ref([
-  {
-    articleID: 1,
-    title: 'on My posh',
-    status: '已发布',
-    classify: [
-      {
-        icon: 'drill-zhongduanliebiao',
-        value: '终端',
-      },
-    ],
-    tag: ['工具类'],
-    release_time: '2024-03-13 21:19:54',
-    change_time: '2024-03-14 21:19:54',
-  },
-  {
-    articleID: 2,
-    title: 'vue.js',
-    status: '未发布',
-    classify: [
-      {
-        icon: 'drill-kuangjia',
-        value: '框架',
-      },
-    ],
-    tag: ['前端'],
-    release_time: '2024-03-13 21:19:54',
-    change_time: '2024-03-14 21:19:54',
-  },
-  {
-    articleID: 3,
-    title: 'Nuxt.js',
-    status: '已发布',
-    classify: [
-      {
-        icon: 'drill-kuangjia',
-        value: '框架',
-      },
-    ],
-    tag: ['全栈'],
-    release_time: '2024-03-13 21:19:54',
-    change_time: '2024-03-14 21:19:54',
-  },
-]);
+const articleData = ref([]);
 const selectValue = ref<string>('发布时间');
 
+const articleListFun = async () => {
+  await articleList().then((res) => {
+    articleData.value = res.data.data;
+  });
+};
+
+/**
+ * 添加文章
+ */
 const AddArticle = () => {
   router.push({
     path: '/blog_management/addArticle',
   });
 };
+/**
+ * 编辑文章
+ */
 const editArticle = (_record: any) => {
   router.push({
     path: '/blog_management/addArticle',
   });
 };
+
+onMounted(() => {
+  articleListFun();
+});
 </script>
 
 <style scoped lang="scss">
