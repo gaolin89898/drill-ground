@@ -25,6 +25,9 @@
       marginTop: '16px',
     }"
   >
+    <template #tagName="{ record }">
+      <a-tag color="arcoblue">{{ record.tagName }}</a-tag>
+    </template>
     <template #describe="{ record }">
       <span v-if="record.describe">{{ record.describe }}</span>
       <span v-else>--</span>
@@ -55,6 +58,7 @@ const columns: TableColumnData[] = [
   {
     title: '标签名称',
     dataIndex: 'tagName',
+    slotName: 'tagName',
   },
   {
     title: '描述',

@@ -25,6 +25,9 @@
       marginTop: '16px',
     }"
   >
+    <template #classificationName="{ record }">
+      <a-tag color="blue">{{ record.classificationName }}</a-tag>
+    </template>
     <template #describe="{ record }">
       <span v-if="record.describe">{{ record.describe }}</span>
       <span v-else>--</span>
@@ -39,7 +42,10 @@
       </a-button>
     </template>
   </a-table>
-  <addEditclassification ref="addEditclassificationRef" @refresh="refresh"></addEditclassification>
+  <addEditclassification
+    ref="addEditclassificationRef"
+    @refresh="refresh"
+  ></addEditclassification>
 </template>
 
 <script setup lang="ts">
@@ -55,6 +61,7 @@ const columns: TableColumnData[] = [
   {
     title: '分类名称',
     dataIndex: 'classificationName',
+    slotName: 'classificationName',
   },
   {
     title: '描述',
@@ -78,7 +85,9 @@ const list = ref<any[]>([]);
 const classificationName = ref<string>('');
 
 const classificationData = async () => {
-  await classificationList({ classificationName: classificationName.value }).then((res) => {
+  await classificationList({
+    classificationName: classificationName.value,
+  }).then((res) => {
     list.value = res.data.data;
   });
 };

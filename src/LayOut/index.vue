@@ -5,9 +5,8 @@
     </a-layout-header>
     <a-layout>
       <div class="sider-layout">
-        <a-layout-sider default-collapsed>
+        <a-layout-sider>
           <a-menu
-            mode="pop"
             theme="light"
             :selected-keys="[$route.path]"
             @menu-item-click="menuClick"
@@ -18,7 +17,7 @@
                   <Icon
                     :icon-type="item.meta?.icon as string"
                     size="15"
-                    color="red"
+                    color="var(--color-text-2)"
                   />
                 </template>
                 {{ item.meta?.title }}
@@ -28,7 +27,7 @@
                   <Icon
                     :icon-type="item.meta?.icon as string"
                     size="15"
-                    color="red"
+                    color="var(--color-text-2)"
                   />
                 </template>
                 <template #title>
@@ -43,7 +42,7 @@
                     <Icon
                       :icon-type="v.meta?.icon as string"
                       size="15"
-                      color="red"
+                      color="var(--color-text-2)"
                     />
                   </template>
                   {{ v.meta?.title }}
