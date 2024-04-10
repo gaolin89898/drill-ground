@@ -6,7 +6,7 @@
       justifyContent: 'space-between',
     }"
   >
-    <a-input placeholder="请输入文章标题"></a-input>
+    <a-input placeholder="请输入文章标题" v-model="articleName"></a-input>
     <a-trigger
       trigger="click"
       position="br"
@@ -43,23 +43,34 @@
             label="分类："
             :label-col-style="{ paddingLeft: '20px' }"
           >
-            <a-select placeholder="请选择分类" :style="{ width: '400px' }">
-              <a-option>Beijing</a-option>
-              <a-option>Shanghai</a-option>
-              <a-option>Guangzhou</a-option>
-            </a-select>
+            <a-select
+              placeholder="请选择分类"
+              :options="classList"
+              :field-names="{
+                value: '_id',
+                label: 'classificationName',
+              }"
+              v-model="form.classID"
+              :style="{ width: '400px' }"
+            ></a-select>
           </a-form-item>
           <a-form-item
             label="标签："
             :label-col-style="{ paddingLeft: '20px' }"
           >
-            <a-select placeholder="请选择标签" :style="{ width: '400px' }">
-              <a-option>Beijing</a-option>
-              <a-option>Shanghai</a-option>
-              <a-option>Guangzhou</a-option>
-            </a-select>
+            <a-select
+              multiple
+              placeholder="请选择标签"
+              :options="tagsList"
+              :field-names="{
+                value: '_id',
+                label: 'tagName',
+              }"
+              v-model="form.tagID"
+              :style="{ width: '400px' }"
+            ></a-select>
           </a-form-item>
-          <a-form-item
+          <!-- <a-form-item
             label="文章封面："
             :label-col-style="{ paddingLeft: '20px' }"
           >
@@ -83,7 +94,7 @@
             <span style="padding-left: 10px">
               建议尺寸：192*128px(封面仅展示在首页中)
             </span>
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item
             label="编辑摘要："
             :label-col-style="{ paddingLeft: '20px' }"
@@ -96,6 +107,7 @@
               allow-clear
               show-word-limit
               auto-size
+              v-model="form.summary"
             />
           </a-form-item>
         </a-form>
@@ -109,8 +121,10 @@
             border-top: 1px solid var(--color-neutral-3);
           "
         >
-          <a-button type="outline" style="margin-right: 15px;">取消</a-button>
-          <a-button type="primary" style="margin-right: 15px;">确定并发布</a-button>
+          <a-button type="outline" style="margin-right: 15px">取消</a-button>
+          <a-button type="primary" style="margin-right: 15px" @click="quding">
+            确定并发布
+          </a-button>
         </div>
       </template>
     </a-trigger>
@@ -121,18 +135,59 @@
       marginTop: '20px',
       height: 'calc(100vh - 170px)',
     }"
-    v-model="text"
+    @onHtmlChanged="onHtmlChanged"
+    v-model="content"
     class=""
   />
 </template>
 <script lang="ts" setup>
 import { MdEditor } from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
+import { tagList } from '@/api/tag/index';
+import { classificationList } from '@/api/class/index';
+import { addArticle } from '@/api/article/index';
+import { Message } from '@arco-design/web-vue';
 
-const text = ref('');
+const articleName = ref<string>('');
+const content = ref<string>('');
+const form = ref({
+  tagID: [],
+  classID: '',
+  summary: '',
+});
 
-const form = ref({});
+const classList = ref<any[]>([]);
+const classificationData = async () => {
+  await classificationList({}).then((res) => {
+    classList.value = res.data.data;
+  });
+};
 
-onMounted(() => {});
+const tagsList = ref<any[]>([]);
+const tagData = async () => {
+  await tagList({}).then((res) => {
+    tagsList.value = res.data.data;
+  });
+};
+
+const onHtmlChanged = (html: string) => {
+  console.log(html);
+};
+
+const quding = async () => {
+  await addArticle({
+    ...form.value,
+    status:'发布',
+    content: content.value,
+    articleName: articleName.value,
+  }).then(() => {
+    Message.success('添加文章成功');
+  });
+};
+
+onMounted(() => {
+  classificationData();
+  tagData();
+});
 </script>
 <style lang="scss" scoped></style>

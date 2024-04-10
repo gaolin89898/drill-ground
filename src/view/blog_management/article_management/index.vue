@@ -147,13 +147,13 @@ const columns: TableColumnData[] = [
       sortDirections: ['ascend', 'descend'],
     },
   },
-  {
-    title: '修改时间',
-    dataIndex: 'reviseAt',
-    sortable: {
-      sortDirections: ['ascend', 'descend'],
-    },
-  },
+  // {
+  //   title: '修改时间',
+  //   dataIndex: 'reviseAt',
+  //   sortable: {
+  //     sortDirections: ['ascend', 'descend'],
+  //   },
+  // },
   {
     title: '操作',
     dataIndex: 'operate',
