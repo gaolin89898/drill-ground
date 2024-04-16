@@ -20,7 +20,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           title: '首页',
           icon: 'drill-shouye',
-          hidden: true,
+          hidden: false,
         },
       },
       {
@@ -29,7 +29,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           title: '博客管理',
           icon: 'drill-boke',
-          hidden: true,
+          hidden: false,
         },
         redirect: '/blog_management/article_management',
         children: [
@@ -41,7 +41,7 @@ const routes: RouteRecordRaw[] = [
             meta: {
               title: '文章管理',
               icon: 'drill-16',
-              hidden: true,
+              hidden: false,
             },
           },
           {
@@ -65,7 +65,7 @@ const routes: RouteRecordRaw[] = [
             meta: {
               title: '标签，分类管理',
               icon: 'drill-biaoqian',
-              hidden: true,
+              hidden: false,
             },
           },
           {
@@ -76,7 +76,7 @@ const routes: RouteRecordRaw[] = [
             meta: {
               title: '回收站',
               icon: 'drill-huishouzhan',
-              hidden: true,
+              hidden: false,
             },
           },
         ],
@@ -88,10 +88,18 @@ const routes: RouteRecordRaw[] = [
         meta: {
           title: '资源管理器',
           icon: 'drill-ziyuanguanliqi',
-          hidden: true,
+          hidden: false,
         },
       },
     ],
+  },
+  {
+    path: '/VueDragResize',
+    name: 'VueDragResize',
+    component: () => import('@/view/components/VueDragResize/index.vue'),
+    meta: {
+      hidden: true,
+    },
   },
   {
     path: '/login',

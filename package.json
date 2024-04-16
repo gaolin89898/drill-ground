@@ -16,6 +16,7 @@
     "md-editor-v3": "^4.12.2",
     "pinia": "^2.1.7",
     "vue": "^3.3.8",
+    "vue-drag-resize": "^1.5.4",
     "vue-router": "4"
   },
   "devDependencies": {

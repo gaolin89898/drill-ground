@@ -12,42 +12,44 @@
             @menu-item-click="menuClick"
           >
             <div v-for="item in menus">
-              <a-menu-item v-if="!item.children" :key="item.path">
-                <template #icon>
-                  <Icon
-                    :icon-type="item.meta?.icon as string"
-                    size="15"
-                    color="var(--color-text-2)"
-                  />
-                </template>
-                {{ item.meta?.title }}
-              </a-menu-item>
-              <a-sub-menu v-else>
-                <template #icon>
-                  <Icon
-                    :icon-type="item.meta?.icon as string"
-                    size="15"
-                    color="var(--color-text-2)"
-                  />
-                </template>
-                <template #title>
-                  {{ item.meta?.title }}
-                </template>
-                <a-menu-item
-                  v-for="v in item.children"
-                  :key="v.path"
-                  v-show="v.meta?.hidden"
-                >
+              <div v-if="!item.meta?.hidden">
+                <a-menu-item v-if="!item.children" :key="item.path">
                   <template #icon>
                     <Icon
-                      :icon-type="v.meta?.icon as string"
+                      :icon-type="item.meta?.icon as string"
                       size="15"
                       color="var(--color-text-2)"
                     />
                   </template>
-                  {{ v.meta?.title }}
+                  {{ item.meta?.title }}
                 </a-menu-item>
-              </a-sub-menu>
+                <a-sub-menu v-else>
+                  <template #icon>
+                    <Icon
+                      :icon-type="item.meta?.icon as string"
+                      size="15"
+                      color="var(--color-text-2)"
+                    />
+                  </template>
+                  <template #title>
+                    {{ item.meta?.title }}
+                  </template>
+                  <a-menu-item
+                    v-for="v in item.children"
+                    :key="v.path"
+                    v-show="v.meta?.hidden"
+                  >
+                    <template #icon>
+                      <Icon
+                        :icon-type="v.meta?.icon as string"
+                        size="15"
+                        color="var(--color-text-2)"
+                      />
+                    </template>
+                    {{ v.meta?.title }}
+                  </a-menu-item>
+                </a-sub-menu>
+              </div>
             </div>
           </a-menu>
         </a-layout-sider>
