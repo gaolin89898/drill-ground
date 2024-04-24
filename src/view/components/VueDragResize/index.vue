@@ -1,7 +1,7 @@
 <template>
   <div class="vuedragresize">
-    <a-card style="width: 200px;">
-      <a-form :model="form" layout="vertical">
+    <div class="vuedragresize_l">
+      <a-form :model="form" layout="vertical" style="width: 190px">
         <a-form-item label="位置" tooltip="组件初始 x，y 位置">
           <div
             style="width: 100%; display: flex; justify-content: space-between"
@@ -53,108 +53,41 @@
           </a-checkbox>
         </a-form-item>
       </a-form>
-    </a-card>
-    <a-card>
-      <div style="position: relative; width: 100%; height: 100%">
-        <VueDragResize
-          v-for="(item, index) in data"
-          :isActive="item.isActive"
-          :w="item.w"
-          :h="item.h"
-          :isDraggable="item.isDraggable"
-          :isResizable="item.isResizable"
-          :parentLimitation="item.parentLimitation"
-          :x="item.x"
-          :y="item.y"
-          :z="item.z"
-          :minw="item.minw"
-          :minh="item.minh"
-          :sticks="item.sticks"
-          @resizing="(newRect) => resize(newRect, item)"
-          @dragging="(newRect) => resize(newRect, item)"
-          :style="{
-            position: 'absolute',
-            background: `${item.color}`,
-          }"
-          @activated="activated(item, index)"
-        ></VueDragResize>
-      </div>
-    </a-card>
+    </div>
+    <div class="vuedragresize_r">
+      <VueDragResize
+        v-for="(item, index) in data"
+        :isActive="item.isActive"
+        :w="item.w"
+        :h="item.h"
+        :isDraggable="item.isDraggable"
+        :isResizable="item.isResizable"
+        :parentLimitation="item.parentLimitation"
+        :x="item.x"
+        :y="item.y"
+        :z="item.z"
+        :minw="item.minw"
+        :minh="item.minh"
+        :sticks="item.sticks"
+        @resizing="(newRect: newRectType) => resize(newRect, item)"
+        @dragging="(newRect: newRectType) => resize(newRect, item)"
+        :style="{
+          position: 'absolute',
+          background: `${item.color}`,
+        }"
+        @activated="activated(item, index)"
+      ></VueDragResize>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import VueDragResize from 'vue-drag-resize/src';
+import { data, dataType, newRectType } from './index';
 
-const form = ref<{
-  isActive?: boolean;
-  isDraggable?: boolean;
-  isResizable?: boolean;
-  parentLimitation?: boolean;
-  snapToGrid?: boolean;
-  w?: number;
-  h?: number;
-  minw?: number;
-  minh?: number;
-  x?: number;
-  y?: number;
-  z?: number;
-  sticks?: string[];
-  color?: string;
-}>({});
+const form = ref<dataType>({});
 
-const data = ref([
-  {
-    isActive: false,
-    isDraggable: true,
-    isResizable: true,
-    parentLimitation: true,
-    snapToGrid: false,
-    w: 80,
-    h: 80,
-    minw: 30,
-    minh: 30,
-    x: 0,
-    y: 0,
-    z: 1,
-    sticks: [],
-    color: 'rgb(239, 154, 154)',
-  },
-  {
-    isActive: false,
-    isDraggable: true,
-    isResizable: true,
-    parentLimitation: true,
-    snapToGrid: false,
-    w: 80,
-    h: 80,
-    minw: 30,
-    minh: 30,
-    x: 90,
-    y: 0,
-    z: 1,
-    sticks: [],
-    color: 'rgb(174, 213, 129)',
-  },
-  {
-    isActive: false,
-    isDraggable: true,
-    isResizable: true,
-    parentLimitation: true,
-    snapToGrid: false,
-    w: 80,
-    h: 80,
-    minw: 30,
-    minh: 30,
-    x: 0,
-    y: 90,
-    z: 1,
-    sticks: [],
-    color: 'rgb(129, 212, 250)',
-  },
-]);
-
-const resize = (newRect, item) => {
+const resize = (newRect: newRectType, item: dataType) => {
   form.value.w = newRect.width;
   form.value.h = newRect.height;
   form.value.x = newRect.top;
@@ -166,11 +99,11 @@ const resize = (newRect, item) => {
   item.y = newRect.left;
 };
 
-const activated = (item, index) => {
+const activated = (item: dataType, index: number) => {
   activateItem(item, index);
 };
 
-function activateItem(item, index) {
+function activateItem(item: dataType, index: number) {
   data.value.forEach((v, i) => {
     if (i == index) {
       v.isActive = true;
@@ -189,5 +122,22 @@ function activateItem(item, index) {
   background: var(--color-neutral-3);
   width: 100vw;
   height: 100vh;
+  display: flex;
+  .vuedragresize_l {
+    width: 220px;
+    height: 500px;
+    margin: 20px 0 20px 20px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .vuedragresize_r {
+    width: calc(100vw - 260px);
+    height: calc(100vh - 40px);
+    margin: 20px;
+    background-color: #ffffff;
+    position: relative;
+  }
 }
 </style>
