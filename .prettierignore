@@ -1,10 +1,7 @@
-# Ignore artifacts:
-.husky
-.nuxt
-.output
-disk
-node_modules/
-pnpm-lock.yaml
-.git/
-.vscode/
-.idea/
+/dist/*
+.local
+.output.js
+/node_modules/**
+
+**/*.svg
+**/*.sh
